@@ -505,9 +505,9 @@ fn test_tx_trace() {
         format!("{:?}", trace),
         concat!(
             "Some([",
-            "Trace { action: AddPending, info: unknown tx, add to pending, time: 8102 }, ",
-            "Trace { action: Proposed, info: ProposalShortId(0xda495f694cac79513d00) proposed in block number(2)-hash(0xb42c5305777987f80112e862a3e722c1d0e68c671f1d8920d16ebfc6783a6467), time: 9102 }, ",
-            "Trace { action: AddCommit, info: add to commit pool, time: 9102 }",
+            "TxTrace { action: AddPending, info: unknown tx, add to pending, time: 8102 }, ",
+            "TxTrace { action: Proposed, info: ProposalShortId(0xda495f694cac79513d00) proposed in block number(2)-hash(0xb42c5305777987f80112e862a3e722c1d0e68c671f1d8920d16ebfc6783a6467), time: 9102 }, ",
+            "TxTrace { action: AddCommit, info: add to commit pool, time: 9102 }",
             "])"
         ),
     );
@@ -520,11 +520,11 @@ fn test_tx_trace() {
     assert_eq!(
         format!("{:?}", trace),
         format!(
-            "{}{}{}{}Trace {{ action: Committed, info: committed in block number({:?})-hash({:#x}), time: 9103 }}{}",
+            "{}{}{}{}TxTrace {{ action: Committed, info: committed in block number({:?})-hash({:#x}), time: 9103 }}{}",
             "Some([",
-            "Trace { action: AddPending, info: unknown tx, add to pending, time: 8102 }, ",
-            "Trace { action: Proposed, info: ProposalShortId(0xda495f694cac79513d00) proposed in block number(2)-hash(0xb42c5305777987f80112e862a3e722c1d0e68c671f1d8920d16ebfc6783a6467), time: 9102 }, ",
-            "Trace { action: AddCommit, info: add to commit pool, time: 9102 }, ",
+            "TxTrace { action: AddPending, info: unknown tx, add to pending, time: 8102 }, ",
+            "TxTrace { action: Proposed, info: ProposalShortId(0xda495f694cac79513d00) proposed in block number(2)-hash(0xb42c5305777987f80112e862a3e722c1d0e68c671f1d8920d16ebfc6783a6467), time: 9102 }, ",
+            "TxTrace { action: AddCommit, info: add to commit pool, time: 9102 }, ",
             block.header().number(),
             block.header().hash(),
             "])"

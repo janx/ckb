@@ -1,9 +1,10 @@
 use faketime::unix_time_as_millis;
 use lru_cache::LruCache;
 use numext_fixed_hash::H256;
+use serde_derive::Serialize;
 use std::fmt;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Hash)]
 pub enum Action {
     AddPending,
     Proposed,
@@ -13,30 +14,30 @@ pub enum Action {
     Committed,
 }
 
-#[derive(Clone, Eq, PartialEq)]
-pub struct Trace {
+#[derive(Clone, Eq, PartialEq, Serialize, Hash)]
+pub struct TxTrace {
     pub action: Action,
     pub info: String,
     pub time: u64,
 }
 
-impl Trace {
-    pub fn new(action: Action, info: String, time: u64) -> Trace {
-        Trace { action, info, time }
+impl TxTrace {
+    pub fn new(action: Action, info: String, time: u64) -> TxTrace {
+        TxTrace { action, info, time }
     }
 }
 
-impl fmt::Debug for Trace {
+impl fmt::Debug for TxTrace {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-            "Trace {{ action: {:?}, info: {}, time: {} }}",
+            "TxTrace {{ action: {:?}, info: {}, time: {} }}",
             self.action, self.info, self.time
         )
     }
 }
 
-impl fmt::Display for Trace {
+impl fmt::Display for TxTrace {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Debug::fmt(&self, f)
     }
@@ -46,7 +47,7 @@ macro_rules! define_method {
     ($name:ident, $action:expr) => {
         pub fn $name<S: ToString>(&mut self, hash: &H256, info: S) {
             self.inner.get_mut(hash).map(|v| {
-                v.push(Trace::new(
+                v.push(TxTrace::new(
                     $action,
                     info.to_string(),
                     unix_time_as_millis(),
@@ -57,29 +58,30 @@ macro_rules! define_method {
 }
 
 #[derive(Clone, Debug)]
-pub struct TraceMap {
-    inner: LruCache<H256, Vec<Trace>>,
+pub struct TxTraceMap {
+    inner: LruCache<H256, Vec<TxTrace>>,
 }
 
-impl TraceMap {
+impl TxTraceMap {
     pub fn new(capacity: usize) -> Self {
-        TraceMap {
+        TxTraceMap {
             inner: LruCache::new(capacity),
         }
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     pub fn add_pending<S: ToString>(&mut self, hash: &H256, info: S) {
         self.inner
             .entry(hash.clone())
             .or_insert_with(Vec::new)
-            .push(Trace::new(
+            .push(TxTrace::new(
                 Action::AddPending,
                 info.to_string(),
                 unix_time_as_millis(),
             ));
     }
 
-    pub fn get(&self, hash: &H256) -> Option<&Vec<Trace>> {
+    pub fn get(&self, hash: &H256) -> Option<&Vec<TxTrace>> {
         self.inner.get(hash)
     }
 
