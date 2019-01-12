@@ -5,7 +5,6 @@ use crate::{
 };
 use ckb_util::RwLock;
 use faketime::unix_time_as_millis;
-use std::default::Default;
 use std::sync::Arc;
 
 fn new_peer_store() -> impl PeerStore {
