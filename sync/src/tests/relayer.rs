@@ -46,9 +46,7 @@ fn relay_compact_block_with_one_tx() {
     thread::Builder::new()
         .name(thread_name)
         .spawn(move || {
-            let last_block = shared1
-                .block(&shared1.chain_state().read().tip_hash())
-                .unwrap();
+            let last_block = shared1.block(&shared1.tip().hash).unwrap();
             let last_cellbase = last_block.commit_transactions().first().unwrap();
 
             // building tx and broadcast it
@@ -162,7 +160,7 @@ fn relay_compact_block_with_one_tx() {
     // find a solution to remove this line after pool refactoring
     thread::sleep(time::Duration::from_secs(2));
 
-    assert_eq!(shared2.chain_state().read().tip_number(), 5);
+    assert_eq!(shared2.tip().number, 5);
 }
 
 #[test]
@@ -183,9 +181,7 @@ fn relay_compact_block_with_missing_indexs() {
     thread::Builder::new()
         .name(thread_name)
         .spawn(move || {
-            let last_block = shared1
-                .block(&shared1.chain_state().read().tip_hash())
-                .unwrap();
+            let last_block = shared1.block(&shared1.tip().hash).unwrap();
             let last_cellbase = last_block.commit_transactions().first().unwrap();
 
             // building 10 txs and broadcast some
@@ -296,7 +292,7 @@ fn relay_compact_block_with_missing_indexs() {
     // Wait node2 receive transaction and block from node1
     let _ = signal_rx2.recv();
 
-    assert_eq!(shared2.chain_state().read().tip_number(), 5);
+    assert_eq!(shared2.tip().number, 5);
 }
 
 fn setup_node(
